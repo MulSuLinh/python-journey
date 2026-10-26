@@ -17,9 +17,14 @@ def parser() -> argparse.ArgumentParser:
     return result
 
 
-def main() -> None:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse arguments; argv can be supplied by tests."""
+    return parser().parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
     """Parse learner arguments and display the resulting namespace."""
-    args = parser().parse_args()
+    args = parse_args(argv)
     print(args)
 
 
