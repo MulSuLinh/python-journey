@@ -1,6 +1,6 @@
 """Exercise 02: compose Bot with a replaceable strategy."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 
 Strategy = Callable[[dict[str, int]], str]
 
@@ -9,11 +9,18 @@ class Bot:
     """Choose actions by delegating to a replaceable strategy."""
 
     def __init__(self, strategy: Strategy):
+        if not callable(strategy):
+            raise TypeError("strategy must be callable")
         self.strategy = strategy
 
     def choose_action(self, state: dict[str, int]) -> str:
         """Ask the current strategy to choose an action."""
-        return self.strategy(state)
+        if not isinstance(state, dict):
+            raise TypeError("state must be a dictionary")
+        action = self.strategy(state)
+        if not isinstance(action, str) or not action:
+            raise ValueError("strategy must return a non-empty action string")
+        return action
 
 
 def move_toward_goal(state: dict[str, int]) -> str:
