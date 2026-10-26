@@ -5,7 +5,10 @@ class Animal:
     """Base class that stores the animal's name."""
 
     def __init__(self, name: str):
-        self.name = name
+        cleaned_name = name.strip()
+        if not cleaned_name:
+            raise ValueError("name must not be empty")
+        self.name = cleaned_name
 
 
 class Dog(Animal):
@@ -17,6 +20,7 @@ class Dog(Animal):
 
 
 def main() -> None:
+    """Create a dog and show inherited data and its own method."""
     dog = Dog("Milo")
     print(dog.speak())
     print("Dog is an Animal because Dog inherits from the Animal class.")
