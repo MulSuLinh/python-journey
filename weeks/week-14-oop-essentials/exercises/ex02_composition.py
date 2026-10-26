@@ -1,6 +1,6 @@
 """Exercise 02: compose Bot with a replaceable strategy."""
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 
 Strategy = Callable[[dict[str, int]], str]
 
