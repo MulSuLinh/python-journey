@@ -1,9 +1,9 @@
 """Structural readiness check for a learner capstone submission.
 
 Canonical requirements and the only rubric live in FINAL_PROJECT.md. This check
-reports mechanical evidence — files present, tests collectable, no bare except —
-so a learner can self-audit before handoff. It does not grade design quality and
-it never replaces human review.
+reports mechanical evidence — files present, parseable Python, tests collectable,
+no bare except — so a learner can self-audit before handoff. It does not grade
+design quality and it never replaces human review.
 """
 
 from __future__ import annotations
@@ -17,15 +17,15 @@ from pathlib import Path
 MIN_TESTS = 5
 MIN_FUNCTIONS = 4
 README_SECTIONS = ("setup", "usage", "test")
+SKIP_DIRS = {".venv", "venv", "env", "__pycache__", ".git", "build", "dist"}
 
 
 def python_files(root: Path) -> list[Path]:
     """Return project Python files, skipping virtualenvs and caches."""
-    skip = {".venv", "venv", "env", "__pycache__", ".git", "build", "dist"}
     return [
         path
         for path in sorted(root.rglob("*.py"))
-        if not skip.intersection(path.parts)
+        if not SKIP_DIRS.intersection(path.parts)
     ]
 
 
@@ -33,8 +33,17 @@ def parse(path: Path) -> ast.Module | None:
     """Return the parsed module, or None when the file cannot be parsed."""
     try:
         return ast.parse(path.read_text(encoding="utf-8"))
-    except (SyntaxError, UnicodeDecodeError):
+    except (OSError, SyntaxError, UnicodeDecodeError):
         return None
+
+
+def check_syntax(files: list[Path]) -> list[str]:
+    """Report Python files that cannot be decoded or parsed."""
+    problems: list[str] = []
+    for path in files:
+        if parse(path) is None:
+            problems.append(f"không đọc/parse được Python file: {path.name}")
+    return problems
 
 
 def check_documents(root: Path) -> list[str]:
@@ -61,7 +70,7 @@ def check_decomposition(files: list[Path]) -> list[str]:
         if tree is None:
             continue
         total += sum(
-            isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
             for node in ast.walk(tree)
         )
     if total < MIN_FUNCTIONS:
@@ -83,37 +92,48 @@ def check_bare_except(files: list[Path]) -> list[str]:
 
 
 def check_tests(root: Path, files: list[Path]) -> list[str]:
-    """Report a shortfall of test functions and any collection failure."""
+    """Require test functions and confirm pytest can collect them."""
     problems: list[str] = []
     test_functions = 0
     test_files = [path for path in files if path.name.startswith("test_")]
+
+    if not test_files:
+        return ["không tìm thấy file test_*.py"]
+
     for path in test_files:
         tree = parse(path)
         if tree is None:
             continue
         test_functions += sum(
-            isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
             and node.name.startswith("test_")
             for node in ast.walk(tree)
         )
     if test_functions < MIN_TESTS:
         problems.append(f"chỉ tìm thấy {test_functions} test, cần >= {MIN_TESTS}")
 
-    if test_files:
+    try:
         collected = subprocess.run(
             [sys.executable, "-m", "pytest", "--collect-only", "-q"],
             cwd=root,
             capture_output=True,
             text=True,
+            timeout=30,
+            check=False,
         )
+    except subprocess.TimeoutExpired:
+        problems.append("pytest collect quá 30 giây")
+    else:
         if collected.returncode != 0:
-            problems.append("pytest không collect được test (xem lỗi import/syntax)")
+            details = (collected.stderr or collected.stdout).strip().splitlines()
+            detail = details[-1] if details else "không có chi tiết"
+            problems.append(f"pytest không collect được test: {detail}")
     return problems
 
 
 def main() -> int:
     """Audit a capstone directory and return a process exit code."""
-    # Console mặc định trên Windows không in được tiếng Việt.
+    # Console mặc định trên Windows có thể không in được tiếng Việt.
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -133,6 +153,7 @@ def main() -> int:
     files = python_files(root)
     problems = [
         *check_documents(root),
+        *check_syntax(files),
         *check_decomposition(files),
         *check_bare_except(files),
         *check_tests(root, files),
