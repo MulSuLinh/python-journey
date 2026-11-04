@@ -2,8 +2,12 @@
 
 
 def distance(position: int, goal: int) -> int:
-    # TODO: reproduce with (1, 4), fix the subtraction and retain an assertion.
-    return position - goal
+    """Return the absolute distance between two positions."""
+    result = abs(position - goal)
+    assert result >= 0
+    return result
 
 
-print(distance(1, 4))
+if __name__ == "__main__":
+    assert distance(1, 4) == 3
+    print(distance(1, 4))
