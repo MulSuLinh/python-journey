@@ -254,6 +254,26 @@ weeks/week-01-hello-python/
 - [Biến và chuỗi](assets/Story-02-Biến%20và%20chuỗi.md)
 - [Hàm và phân rã vấn đề](assets/Story-07-%20Hàm.md)
 
+## 🌐 Website demo tương tác (Streamlit)
+
+Python Journey có một website tổng hợp lộ trình 15 tuần, tài liệu và mã nguồn bài học, kèm phòng thực hành tương tác.
+
+Chạy tại máy:
+
+```bash
+python -m pip install -r requirements.txt
+streamlit run app.py
+```
+
+Sau đó mở địa chỉ local mà Streamlit hiển thị (mặc định là `http://localhost:8501`).
+
+- [Hướng dẫn chạy và deploy website](STREAMLIT.md)
+- [Mã nguồn ứng dụng](app.py)
+
+Website hiển thị các file bài học/bài tập để đọc và tham khảo; không tự động thực thi mã nguồn tùy ý.
+
+---
+
 ---
 
 > **Learn it. Build it. Test it. Understand it. Improve it.**
