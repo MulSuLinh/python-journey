@@ -1,48 +1,39 @@
-"""
-Bài tập 02: Chuyển đổi kiểu dữ liệu 🔄
-=========================================
-Mục tiêu: Thành thạo int(), float(), str(), bool()
-"""
-
-# TODO 1: Cho so_text = "42"
-# Chuyển sang int, cộng thêm 8, in kết quả
+"""Bài tập 02: Chuyển đổi kiểu dữ liệu 🔄"""
+# TODO 1: Chuyển "42" sang int, cộng thêm 8
 so_text = "42"
 so_nguyen = int(so_text)
 print("42 + 8 =", so_nguyen + 8)
 
-
-# TODO 2: Cho pi = 3.14159
-# Chuyển sang int (sẽ được bao nhiêu?), in kết quả
+# TODO 2: Chuyển pi sang int
 pi = 3.14159
 print("int(pi) =", int(pi))
 
+# TODO 3: Kiểm tra bool() của các giá trị
+gia_tri = [0, 1, "", "hello", [], [1, 2]]
+for value in gia_tri:
+    print(f"bool({value!r}) =", bool(value))
 
-# TODO 3: Kiểm tra bool() của các giá trị sau và in kết quả
-# bool(0), bool(1), bool(""), bool("hello"), bool([]), bool([1,2])
-cac_gia_tri = [0, 1, "", "hello", [], [1, 2]]
-for gia_tri in cac_gia_tri:
-    print(f"bool({gia_tri!r}) =", bool(gia_tri))
+# TODO 4: Nhập chiều cao, cân nặng và tính BMI
+try:
+    chieu_cao = float(input("Nhập chiều cao (m): "))
+    can_nang = float(input("Nhập cân nặng (kg): "))
+    if chieu_cao <= 0 or can_nang <= 0:
+        print("Chiều cao và cân nặng phải lớn hơn 0.")
+    else:
+        bmi = can_nang / chieu_cao ** 2
+        print(f"BMI của bạn: {bmi:.1f}")
+except ValueError:
+    print("Vui lòng nhập chiều cao và cân nặng bằng số.")
 
-
-# TODO 4: Nhập chiều cao (m) và cân nặng (kg) từ người dùng
-# Tính BMI = cân_nặng / (chiều_cao ** 2)
-# In ra BMI với 1 chữ số thập phân
-chieu_cao = float(input("Nhập chiều cao (m): "))
-can_nang = float(input("Nhập cân nặng (kg): "))
-if chieu_cao > 0 and can_nang >= 0:
-    bmi = can_nang / (chieu_cao ** 2)
-    print(f"BMI của bạn: {bmi:.1f}")
-else:
-    print("Chiều cao phải lớn hơn 0 và cân nặng không được âm.")
-
-
-# TODO 5 (Thử thách): Nhập số giây, chuyển sang giờ:phút:giây
-# Ví dụ: 3661 giây → "1 giờ 1 phút 1 giây"
-tong_giay = int(input("Nhập số giây: "))
-if tong_giay >= 0:
-    gio = tong_giay // 3600
-    phut = (tong_giay % 3600) // 60
-    giay = tong_giay % 60
-    print(f"{gio} giờ {phut} phút {giay} giây")
-else:
-    print("Số giây không được âm.")
+# TODO 5: Đổi số giây thành giờ, phút, giây
+try:
+    tong_giay = int(input("Nhập số giây: "))
+    if tong_giay < 0:
+        print("Số giây không được âm.")
+    else:
+        gio = tong_giay // 3600
+        phut = (tong_giay % 3600) // 60
+        giay = tong_giay % 60
+        print(f"{gio} giờ {phut} phút {giay} giây")
+except ValueError:
+    print("Vui lòng nhập số giây là số nguyên.")
